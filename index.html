@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desafio de Consistência - Concurso</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 50: '#eef2ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca' }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome para Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .gold-badge {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen transition-colors duration-200">
+
+    <!-- HEADER -->
+    <header class="bg-slate-800 border-b border-slate-700 sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-indigo-600 p-2.5 rounded-xl text-white shadow-lg shadow-indigo-500/30">
+                    <i class="fa-solid fa-fire text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg tracking-tight flex items-center gap-2">
+                        Desafio de Consistência
+                        <span class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full font-medium">Ao Vivo ⚡</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Sincronizado automaticamente entre todo o grupo 🎯</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button onclick="alternarTema()" class="p-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 transition" title="Alternar Tema">
+                    <i id="icone-tema" class="fa-solid fa-sun"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="max-w-4xl mx-auto px-4 py-6 space-y-6">
+
+        <!-- STATUS DE CONEXÃO E CONFIGURAÇÃO DA NUVEM -->
+        <section id="banner-status" class="bg-slate-800/80 border border-slate-700 rounded-2xl p-4 text-xs text-slate-300 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <span id="indicador-nuvem" class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span id="texto-nuvem">Conectado ao Banco de Dados Nuvem em Tempo Real</span>
+            </div>
+            <span class="text-slate-400">Sincronização 100% Automática</span>
+        </section>
+
+        <!-- FORMULÁRIO DE REGISTRO -->
+        <section class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-xl">
+            <h2 class="text-base font-semibold mb-4 flex items-center text-indigo-400">
+                <i class="fa-solid fa-plus-circle mr-2"></i> Registrar Estudo de Hoje
+            </h2>
+            <form id="form-estudo" onsubmit="registrarEstudo(event)" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Seu Nome</label>
+                    <input type="text" id="nome" required placeholder="Ex: João Pedro" 
+                        class="w-full bg-slate-900 border border-slate-750 rounded-xl px-3 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Tempo Estudado</label>
+                    <div class="flex space-x-2">
+                        <input type="number" id="tempo" required min="1" placeholder="Minutos" 
+                            class="w-full bg-slate-900 border border-slate-750 rounded-xl px-3 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Matéria / Foco</label>
+                    <input type="text" id="materia" placeholder="Ex: Direito Constitucional" 
+                        class="w-full bg-slate-900 border border-slate-750 rounded-xl px-3 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div class="flex items-end">
+                    <button type="submit" id="btn-enviar" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2.5 px-4 rounded-xl text-sm transition shadow-lg shadow-indigo-600/20 flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <span>Lançar na Nuvem</span>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- PLACAR / RANKING SEMANAL COM DESTAQUE TOP 1 -->
+        <section class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-xl">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 gap-3">
+                <div>
+                    <h2 class="text-base font-semibold flex items-center text-amber-400">
+                        <i class="fa-solid fa-trophy mr-2"></i> Ranking Geral do Grupo
+                    </h2>
+                    <p class="text-xs text-slate-400">Atualizado instantaneamente para todos os membros</p>
+                </div>
+                <button onclick="copiarRankingWhatsApp()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium py-2 px-3.5 rounded-lg transition flex items-center space-x-2 shadow-lg shadow-emerald-600/20">
+                    <i class="fa-brands fa-whatsapp text-sm"></i>
+                    <span>Copiar Resumo p/ WhatsApp</span>
+                </button>
+            </div>
+
+            <!-- Lista do Ranking -->
+            <div id="lista-ranking" class="space-y-3">
+                <p class="text-slate-400 text-sm text-center py-4">Carregando dados em tempo real...</p>
+            </div>
+        </section>
+
+        <!-- HISTÓRICO RECENTE GLOBAL -->
+        <section class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-xl">
+            <h2 class="text-base font-semibold mb-3 flex items-center text-slate-300">
+                <i class="fa-solid fa-clock-rotate-left mr-2"></i> Feed de Estudos Recentes
+            </h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-slate-900/50 text-slate-400 text-xs uppercase">
+                        <tr>
+                            <th class="p-3 rounded-l-lg">Participante</th>
+                            <th class="p-3">Tempo</th>
+                            <th class="p-3">Matéria</th>
+                            <th class="p-3 rounded-r-lg">Data</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-historico" class="divide-y divide-slate-700/50 text-slate-300">
+                        <tr><td colspan="4" class="p-4 text-center text-slate-400">Carregando histórico...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="text-center py-6 text-xs text-slate-500">
+        Plataforma em Tempo Real do Grupo de Estudos 🚀 Mantendo a consistência diária.
+    </footer>
+
+    <!-- SCRIPT DE CONFIGURAÇÃO E INTEGRAÇÃO DO FIREBASE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Configurações do Firebase
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'desafio-estudos-default';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyDemoKeyDoNotUse",
+            authDomain: "demo-project.firebaseapp.com",
+            projectId: "demo-project",
+            storageBucket: "demo-project.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:123456"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        let currentUser = null;
+        let registrosGlobais = [];
+
+        // Coleção Firestore seguindo strict pathing
+        const colecaoEstudos = collection(db, 'artifacts', appId, 'public', 'data', 'registros_estudos');
+
+        // Autenticação
+        async function autenticar() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    const userCredential = await signInWithCustomToken(auth, __initial_auth_token);
+                    currentUser = userCredential.user;
+                } else {
+                    const userCredential = await signInAnonymously(auth);
+                    currentUser = userCredential.user;
+                }
+                iniciarEscutaTempoReal();
+            } catch (error) {
+                console.error("Erro ao autenticar no Firebase:", error);
+                document.getElementById('indicador-nuvem').className = "w-3 h-3 rounded-full bg-amber-500";
+                document.getElementById('texto-nuvem').innerText = "Modo Standby / Autenticando...";
+            }
+        }
+
+        // Escutar alterações na Nuvem em Tempo Real
+        function iniciarEscutaTempoReal() {
+            if (!currentUser) return;
+
+            const q = query(colecaoEstudos);
+            onSnapshot(q, (snapshot) => {
+                registrosGlobais = [];
+                snapshot.forEach((doc) => {
+                    registrosGlobais.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Ordenar por data mais recente localmente
+                registrosGlobais.sort((a, b) => b.timestamp - a.timestamp);
+
+                atualizarTela();
+            }, (error) => {
+                console.error("Erro na escuta do Firestore:", error);
+            });
+        }
+
+        // Registrar estudo na nuvem
+        window.registrarEstudo = async function(event) {
+            event.preventDefault();
+            
+            const btnEnviar = document.getElementById('btn-enviar');
+            btnEnviar.disabled = true;
+            btnEnviar.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Salvando...</span>`;
+
+            const nome = document.getElementById('nome').value.trim();
+            const tempo = parseInt(document.getElementById('tempo').value);
+            const materia = document.getElementById('materia').value.trim() || 'Geral';
+            const data = new Date().toLocaleDateString('pt-BR');
+            const timestamp = Date.now();
+
+            try {
+                await addDoc(colecaoEstudos, {
+                    nome,
+                    tempo,
+                    materia,
+                    data,
+                    timestamp,
+                    userId: currentUser?.uid || 'anonimo'
+                });
+
+                document.getElementById('tempo').value = '';
+                document.getElementById('materia').value = '';
+            } catch (err) {
+                console.error("Erro ao salvar no Firestore:", err);
+            } finally {
+                btnEnviar.disabled = false;
+                btnEnviar.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> <span>Lançar na Nuvem</span>`;
+            }
+        }
+
+        function calcularRanking() {
+            let acumulado = {};
+
+            registrosGlobais.forEach(reg => {
+                if (!acumulado[reg.nome]) {
+                    acumulado[reg.nome] = 0;
+                }
+                acumulado[reg.nome] += Number(reg.tempo || 0);
+            });
+
+            let rankingArray = Object.keys(acumulado).map(nome => ({
+                nome,
+                totalMinutos: acumulado[nome]
+            }));
+
+            rankingArray.sort((a, b) => b.totalMinutos - a.totalMinutos);
+            return rankingArray;
+        }
+
+        function formatarTempo(minutos) {
+            const horas = Math.floor(minutos / 60);
+            const mins = minutos % 60;
+            if (horas === 0) return `${mins}m`;
+            if (mins === 0) return `${horas}h`;
+            return `${horas}h ${mins}m`;
+        }
+
+        function atualizarTela() {
+            const ranking = calcularRanking();
+            const containerRanking = document.getElementById('lista-ranking');
+            const corpoTabela = document.getElementById('tabela-historico');
+
+            if (ranking.length === 0) {
+                containerRanking.innerHTML = `<p class="text-slate-400 text-sm text-center py-4">Nenhum estudo registrado na nuvem ainda. Seja o primeiro a lançar!</p>`;
+            } else {
+                let maxMinutos = ranking[0].totalMinutos || 1;
+                containerRanking.innerHTML = ranking.map((item, index) => {
+                    const isTop1 = index === 0;
+                    let medalha = isTop1 ? '👑 1º' : index === 1 ? '🥈 2º' : index === 2 ? '🥉 3º' : `${index + 1}º`;
+                    let porcentagem = Math.min(Math.round((item.totalMinutos / maxMinutos) * 100), 100);
+
+                    if (isTop1) {
+                        return `
+                            <div class="gold-badge p-4 rounded-xl text-white relative overflow-hidden transition-all duration-300 transform hover:scale-[1.01]">
+                                <div class="absolute -right-4 -bottom-4 opacity-20 text-6xl text-amber-100">
+                                    <i class="fa-solid fa-trophy"></i>
+                                </div>
+                                <div class="flex justify-between items-center mb-2 text-sm font-bold">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="bg-amber-900/40 px-2.5 py-1 rounded-lg text-amber-100 text-xs tracking-wider uppercase font-black border border-amber-300/30">LÍDER ATUAL</span>
+                                        <span class="text-base text-amber-100 font-extrabold">${item.nome}</span>
+                                    </div>
+                                    <span class="text-lg text-white font-black">${formatarTempo(item.totalMinutos)}</span>
+                                </div>
+                                <div class="w-full bg-amber-950/40 h-2.5 rounded-full overflow-hidden border border-amber-300/30">
+                                    <div class="bg-white h-full rounded-full transition-all duration-500" style="width: ${porcentagem}%"></div>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    return `
+                        <div class="bg-slate-900/60 p-3.5 rounded-xl border border-slate-700/50">
+                            <div class="flex justify-between items-center mb-1.5 text-sm">
+                                <div class="font-medium flex items-center space-x-2">
+                                    <span class="w-8 text-center text-xs text-slate-400 font-bold">${medalha}</span>
+                                    <span>${item.nome}</span>
+                                </div>
+                                <span class="font-bold text-indigo-400">${formatarTempo(item.totalMinutos)}</span>
+                            </div>
+                            <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden">
+                                <div class="bg-indigo-500 h-full rounded-full transition-all duration-500" style="width: ${porcentagem}%"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            if (registrosGlobais.length === 0) {
+                corpoTabela.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">Nenhum registro recente na nuvem.</td></tr>`;
+            } else {
+                corpoTabela.innerHTML = registrosGlobais.slice(0, 10).map(reg => `
+                    <tr class="border-b border-slate-700/30 hover:bg-slate-900/30">
+                        <td class="p-3 font-medium text-slate-200">${reg.nome}</td>
+                        <td class="p-3 text-indigo-300 font-semibold">${formatarTempo(reg.tempo)}</td>
+                        <td class="p-3 text-slate-400">${reg.materia}</td>
+                        <td class="p-3 text-slate-500 text-xs">${reg.data}</td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        window.copiarRankingWhatsApp = function() {
+            const ranking = calcularRanking();
+            if (ranking.length === 0) {
+                alert("Ainda não há dados no ranking para copiar!");
+                return;
+            }
+
+            let texto = "🏆 *RANKING AO VIVO DE ESTUDOS* 📚\n\n";
+            ranking.forEach((item, index) => {
+                let icone = index === 0 ? "👑" : index === 1 ? "🥈" : index === 2 ? "🥉" : "▪️";
+                texto += `${icone} *${item.nome}* — ${formatarTempo(item.totalMinutos)}\n`;
+            });
+            texto += "\n🔥 *Ranking sincronizado automaticamente! Registre suas horas no site.*";
+
+            document.execCommand('copy');
+            navigator.clipboard.writeText(texto).then(() => {
+                alert("Ranking copiado com sucesso! Só colar no WhatsApp 📱");
+            });
+        }
+
+        window.alternarTema = function() {
+            const html = document.documentElement;
+            const icone = document.getElementById('icone-tema');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                icone.className = "fa-solid fa-moon";
+            } else {
+                html.classList.add('dark');
+                icone.className = "fa-sun fa-solid";
+            }
+        }
+
+        // Inicializar Autenticação
+        autenticar();
+    </script>
+</body>
+</html>
